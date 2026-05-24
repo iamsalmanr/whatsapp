@@ -76,10 +76,11 @@
                             </div>
                             <div class="flex gap-4 ml-1">
                                 <label class="flex items-center cursor-pointer text-[11px] text-gray-500 font-medium">
-                                    <input type="radio" name="dateStyle" value="mil" checked onchange="rebuildEditorFromSettings()" class="mr-1.5 accent-green-600"> Military
+                                    <input type="radio" name="dateStyle" value="mil" onchange="rebuildEditorFromSettings()" class="mr-1.5 accent-green-600"> Military
                                 </label>
                                 <label class="flex items-center cursor-pointer text-[11px] text-gray-500 font-medium">
-                                    <input type="radio" name="dateStyle" value="intl" onchange="rebuildEditorFromSettings()" class="mr-1.5 accent-green-600"> International
+                                    <!-- International set as CHECKED by default -->
+                                    <input type="radio" name="dateStyle" value="intl" checked onchange="rebuildEditorFromSettings()" class="mr-1.5 accent-green-600"> International
                                 </label>
                             </div>
                         </div>
@@ -148,8 +149,7 @@
     <!-- FOOTER -->
     <footer class="mt-8 py-6 px-4 text-center border-t border-gray-200 text-gray-500 bg-white">
         <p class="text-sm">Developed by <strong>Capt Salman, sigs</strong></p>
-        <p class="text-[9px] mt-1 opacity-40 uppercase tracking-widest font-bold">Signal Corps Communication Protocol</p>
-    </footer>
+            </footer>
 
     <script>
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -209,9 +209,12 @@
             
             lines.push("", savedBody || "", "");
 
-            if(document.getElementById('checkInfo').checked) lines.push("For your kind info sir.");
+            if(document.getElementById('checkInfo').checked) {
+                lines.push("For your kind info sir.");
+            }
+            
             if(document.getElementById('checkRegards').checked) {
-                lines.push("Kind Regards", "Capt X");
+                lines.push("", "Kind Regards", "Capt Salman");
             }
 
             editor.value = lines.join("\n").replace(/\n{4,}/g, '\n\n').trim();
