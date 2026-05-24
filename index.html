@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WhatsApp Formatter Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Force no-zoom on mobile */
+        body { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
         .whatsapp-bg { background-color: #075e54; }
         .whatsapp-bubble { 
             background-color: #dcf8c6; 
@@ -13,7 +15,6 @@
             position: relative; 
             min-height: 50px;
             word-wrap: break-word;
-            overflow-wrap: break-word;
         }
         .whatsapp-bubble::after {
             content: '';
@@ -25,29 +26,27 @@
         #previewContainer { 
             white-space: pre-wrap; 
             word-wrap: break-word; 
-            overflow-wrap: break-word;
             font-family: Arial, sans-serif;
             line-height: 1.4;
         }
-        b { font-weight: bold; }
-        i { font-style: italic; }
         .transition-transform { transition: transform 0.3s ease; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-100 min-h-screen flex flex-col overflow-x-hidden">
 
     <!-- HEADER -->
-    <header class="bg-white shadow-sm border-b border-gray-200 py-4 px-6 mb-4 md:mb-6">
+    <header class="bg-white shadow-sm border-b border-gray-200 py-4 px-6 mb-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <h1 class="text-lg md:text-xl font-bold text-green-700 flex items-center gap-2">
                 <span class="bg-green-600 text-white px-2 py-0.5 rounded text-sm">WP</span>
                 Message Formatter Pro
             </h1>
-                    </div>
+            <span class="text-[10px] text-gray-400 font-mono hidden sm:inline uppercase tracking-widest">Sigs Communication Tool</span>
+        </div>
     </header>
 
     <main class="flex-grow px-4 md:px-8">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             
             <!-- INPUT SECTION -->
             <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-fit">
@@ -65,74 +64,67 @@
                 <!-- Collapsible Content -->
                 <div id="settingsContent" class="p-5 space-y-4">
                     <div class="grid grid-cols-1 gap-2">
-                        <label class="flex items-center justify-between p-2 bg-white rounded border cursor-pointer hover:border-green-500 transition">
+                        <label class="flex items-center justify-between p-2 bg-white rounded border cursor-pointer">
                             <span class="text-xs font-semibold text-gray-600">Enable Greeting</span>
-                            <input type="checkbox" id="checkGreeting" checked onchange="refreshMasterEditor()" class="w-5 h-5 accent-green-600">
+                            <input type="checkbox" id="checkGreeting" checked onchange="rebuildEditorFromSettings()" class="w-5 h-5 accent-green-600">
                         </label>
 
                         <div class="p-2 bg-white rounded border">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-xs font-semibold text-gray-600">Enable Date (BOLD)</span>
-                                <input type="checkbox" id="checkDate" checked onchange="refreshMasterEditor()" class="w-5 h-5 accent-green-600">
+                                <input type="checkbox" id="checkDate" checked onchange="rebuildEditorFromSettings()" class="w-5 h-5 accent-green-600">
                             </div>
                             <div class="flex gap-4 ml-1">
-                                <label class="flex items-center cursor-pointer text-[11px] font-medium text-gray-500">
-                                    <input type="radio" name="dateStyle" value="mil" checked onchange="refreshMasterEditor()" class="mr-1.5 accent-green-600"> Military
+                                <label class="flex items-center cursor-pointer text-[11px] text-gray-500 font-medium">
+                                    <input type="radio" name="dateStyle" value="mil" checked onchange="rebuildEditorFromSettings()" class="mr-1.5 accent-green-600"> Military
                                 </label>
-                                <label class="flex items-center cursor-pointer text-[11px] font-medium text-gray-500">
-                                    <input type="radio" name="dateStyle" value="intl" onchange="refreshMasterEditor()" class="mr-1.5 accent-green-600"> International
+                                <label class="flex items-center cursor-pointer text-[11px] text-gray-500 font-medium">
+                                    <input type="radio" name="dateStyle" value="intl" onchange="rebuildEditorFromSettings()" class="mr-1.5 accent-green-600"> International
                                 </label>
                             </div>
                         </div>
 
-                        <label class="flex items-center justify-between p-2 bg-white rounded border cursor-pointer hover:border-green-500 transition">
+                        <label class="flex items-center justify-between p-2 bg-white rounded border cursor-pointer">
                             <span class="text-xs font-semibold text-gray-600">Enable "For info" Line</span>
-                            <input type="checkbox" id="checkInfo" checked onchange="refreshMasterEditor()" class="w-5 h-5 accent-green-600">
+                            <input type="checkbox" id="checkInfo" checked onchange="rebuildEditorFromSettings()" class="w-5 h-5 accent-green-600">
                         </label>
 
-                        <label class="flex items-center justify-between p-2 bg-white rounded border cursor-pointer hover:border-green-500 transition">
+                        <label class="flex items-center justify-between p-2 bg-white rounded border cursor-pointer">
                             <span class="text-xs font-semibold text-gray-600">Enable "Kind Regards"</span>
-                            <input type="checkbox" id="checkRegards" checked onchange="refreshMasterEditor()" class="w-5 h-5 accent-green-600">
+                            <input type="checkbox" id="checkRegards" checked onchange="rebuildEditorFromSettings()" class="w-5 h-5 accent-green-600">
                         </label>
                     </div>
                 </div>
 
-                <!-- Always Visible Inputs -->
+                <!-- Main Input Fields -->
                 <div class="p-5 bg-white border-t border-gray-100 space-y-4">
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Subject</label>
-                        <input type="text" id="inputSubject" oninput="refreshMasterEditor()" placeholder="Subject line..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                        <input type="text" id="inputSubject" oninput="rebuildEditorFromSettings()" placeholder="Subject line..." class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-green-500 outline-none">
                     </div>
 
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[10px] font-bold text-gray-400 uppercase">Main Editor</label>
-                            <div class="flex gap-2">
-                                <button onclick="undo()" class="bg-white px-2 py-1 rounded text-[10px] border shadow-sm hover:bg-gray-50">Undo</button>
-                            </div>
+                            <button onclick="undo()" class="bg-white px-2 py-1 rounded text-[10px] border shadow-sm hover:bg-gray-50 active:scale-95 transition">Undo</button>
                         </div>
                         <div class="mb-2 flex gap-2">
-                            <button onclick="insertTag('*')" class="bg-gray-100 px-3 py-1.5 rounded text-[11px] font-bold hover:bg-gray-200 border">Bold</button>
-                            <button onclick="insertTag('_')" class="bg-gray-100 px-3 py-1.5 rounded text-[11px] italic hover:bg-gray-200 border">Italic</button>
+                            <button onclick="insertTag('*')" class="bg-gray-100 px-3 py-1.5 rounded text-[11px] font-bold border hover:bg-gray-200">Bold</button>
+                            <button onclick="insertTag('_')" class="bg-gray-100 px-3 py-1.5 rounded text-[11px] italic border hover:bg-gray-200">Italic</button>
                         </div>
-                        <textarea id="masterEditor" rows="10" oninput="saveToHistory(); updatePreview();" class="w-full border rounded-lg p-3 font-mono text-sm focus:ring-2 focus:ring-green-500 outline-none leading-relaxed" placeholder="Type message body..."></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Written By</label>
-                        <input type="text" id="inputName" value="Capt X" oninput="refreshMasterEditor()" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                        <textarea id="masterEditor" rows="12" oninput="handleEditorInput()" class="w-full border rounded-lg p-3 font-mono text-sm focus:ring-2 focus:ring-green-500 outline-none leading-relaxed" placeholder="Type message body here..."></textarea>
                     </div>
                 </div>
             </div>
 
             <!-- PREVIEW SECTION -->
             <div class="whatsapp-bg p-4 md:p-6 rounded-xl shadow-lg flex flex-col h-fit lg:sticky lg:top-4 overflow-hidden">
-                <h2 class="text-white text-base font-bold mb-4 flex items-center justify-between">
+                <h2 class="text-white text-base font-bold mb-4 flex justify-between items-center">
                     WhatsApp Preview
-                    <span class="text-[10px] opacity-60 font-normal uppercase tracking-widest">Live View</span>
+                    <span class="text-[10px] opacity-60 uppercase tracking-widest">Live View</span>
                 </h2>
                 
-                <div class="flex-grow flex items-start justify-end mb-6">
+                <div class="flex-grow flex items-start justify-end mb-6 overflow-x-hidden">
                     <div class="whatsapp-bubble p-4 text-[15px] text-gray-800 w-full sm:max-w-[95%] shadow-lg">
                         <div id="previewContainer"></div>
                     </div>
@@ -140,11 +132,10 @@
 
                 <div class="mt-auto space-y-3">
                     <div class="flex flex-col sm:flex-row gap-3">
-                        <button onclick="copyMessage()" class="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-bold py-3.5 px-4 rounded-xl transition-all shadow-sm border-b-4 border-gray-300 active:border-b-0 active:translate-y-1 text-sm">
+                        <button onclick="copyMessage()" class="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-bold py-3.5 px-4 rounded-xl shadow-sm border-b-4 border-gray-300 active:border-b-0 active:translate-y-1 text-sm">
                             Copy Text
                         </button>
-                        <button onclick="sendToWhatsApp()" class="flex-[1.5] bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md border-b-4 border-green-700 active:border-b-0 active:translate-y-1 flex items-center justify-center gap-2 text-sm">
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        <button onclick="sendToWhatsApp()" class="flex-[1.5] bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-md border-b-4 border-green-700 active:border-b-0 active:translate-y-1 flex items-center justify-center gap-2 text-sm">
                             Send Message
                         </button>
                     </div>
@@ -157,139 +148,122 @@
     <!-- FOOTER -->
     <footer class="mt-8 py-6 px-4 text-center border-t border-gray-200 text-gray-500 bg-white">
         <p class="text-sm">Developed by <strong>Capt Salman, sigs</strong></p>
- 
+        <p class="text-[9px] mt-1 opacity-40 uppercase tracking-widest font-bold">Signal Corps Communication Protocol</p>
     </footer>
 
     <script>
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const editor = document.getElementById('masterEditor');
+        let savedBody = "";
         let historyStack = [];
         let historyIndex = -1;
-        const editor = document.getElementById('masterEditor');
+
+        // --- PREVENT PINCH ZOOM & DOUBLE TAP ZOOM ---
+        document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        let lastTouch = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouch <= 300) e.preventDefault();
+            lastTouch = now;
+        }, false);
 
         function toggleSettings() {
             const content = document.getElementById('settingsContent');
             const icon = document.getElementById('toggleIcon');
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                content.classList.add('hidden');
-                icon.style.transform = 'rotate(0deg)';
-            }
+            content.classList.toggle('hidden');
+            icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
         }
 
-        function saveToHistory() {
-            const currentText = editor.value;
-            if (historyStack[historyIndex] === currentText) return;
+        function parseCurrentBody(fullText) {
+            const lines = fullText.split('\n');
+            let bodyLines = [];
+            for (let line of lines) {
+                let clean = line.trim();
+                if (clean === "For your kind info sir." || clean === "Kind Regards") break;
+                if (clean === "Assalamualaikum sir," || clean.startsWith("*Date:") || clean.startsWith("*Subj:")) continue;
+                bodyLines.push(line);
+            }
+            return bodyLines.join('\n').trim();
+        }
+
+        function handleEditorInput() {
+            savedBody = parseCurrentBody(editor.value);
+            saveHistory();
+            updatePreview();
+        }
+
+        function rebuildEditorFromSettings() {
+            let lines = [];
+            if(document.getElementById('checkGreeting').checked) lines.push("Assalamualaikum sir,");
+            if(document.getElementById('checkDate').checked) {
+                const now = new Date();
+                const style = document.querySelector('input[name="dateStyle"]:checked').value;
+                const d = String(now.getDate()).padStart(2, '0');
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const dateStr = (style === "mil") ? `${d}${h}${m}F ${now.getFullYear()}` : `${h}${m} Hrs, ${d} ${months[now.getMonth()]} ${now.getFullYear()}`;
+                lines.push(`*Date: ${dateStr}*`);
+            }
+            const subj = document.getElementById('inputSubject').value;
+            if(subj) lines.push(`*Subj: ${subj}*`);
+            
+            lines.push("", savedBody || "", "");
+
+            if(document.getElementById('checkInfo').checked) lines.push("For your kind info sir.");
+            if(document.getElementById('checkRegards').checked) {
+                lines.push("Kind Regards", "Capt X");
+            }
+
+            editor.value = lines.join("\n").replace(/\n{4,}/g, '\n\n').trim();
+            saveHistory();
+            updatePreview();
+        }
+
+        function saveHistory() {
+            if (historyStack[historyIndex] === editor.value) return;
             historyStack = historyStack.slice(0, historyIndex + 1);
-            historyStack.push(currentText);
-            if (historyStack.length > 50) historyStack.shift();
-            else historyIndex++;
+            historyStack.push(editor.value);
+            if (historyStack.length > 50) historyStack.shift(); else historyIndex++;
         }
 
         function undo() {
             if (historyIndex > 0) {
                 historyIndex--;
                 editor.value = historyStack[historyIndex];
+                savedBody = parseCurrentBody(editor.value);
                 updatePreview();
             }
         }
 
-        function getFormattedDateLine() {
-            const now = new Date();
-            const d = String(now.getDate()).padStart(2, '0');
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const y = now.getFullYear();
-            const style = document.querySelector('input[name="dateStyle"]:checked').value;
-            const dateVal = (style === "mil") ? `${d}${h}${m}F ${y}` : `${h}${m} Hrs, ${d} ${months[now.getMonth()]} ${y}`;
-            return `*Date: ${dateVal}*`;
-        }
-
-        function refreshMasterEditor() {
-            const currentFullText = editor.value;
-            let lines = [];
-            
-            if(document.getElementById('checkGreeting').checked) lines.push("Assalamualaikum sir,");
-            if(document.getElementById('checkDate').checked) lines.push(getFormattedDateLine());
-            
-            const subj = document.getElementById('inputSubject').value;
-            if(subj) lines.push(`*Subj: ${subj}*`);
-            
-            lines.push("");
-
-            if(!currentFullText) {
-                            } else {
-                const currentLines = currentFullText.split('\n');
-                const userLines = currentLines.filter(line => 
-                    !line.includes("Assalamualaikum") && 
-                    !line.startsWith("*Date:") && 
-                    !line.startsWith("*Subj:") && 
-                    !line.includes("For your kind info sir.") && 
-                    !line.includes("Kind Regards") &&
-                    line !== document.getElementById('inputName').value
-                );
-                lines.push(...userLines);
-            }
-
-            let finalOutput = lines.join("\n").replace(/\n{3,}/g, '\n\n').trim();
-
-            if(document.getElementById('checkInfo').checked) {
-                finalOutput += "\n\nFor your kind info sir.";
-            }
-
-            if(document.getElementById('checkRegards').checked) {
-                finalOutput += "\n\nKind Regards\n" + document.getElementById('inputName').value;
-            }
-
-            editor.value = finalOutput.trim();
-            saveToHistory();
-            updatePreview();
-        }
-
         function insertTag(tag) {
-            const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            const text = editor.value;
-            editor.value = text.substring(0, start) + tag + text.substring(start, end) + tag + text.substring(end);
-            saveToHistory();
-            updatePreview();
+            const start = editor.selectionStart, end = editor.selectionEnd;
+            editor.value = editor.value.substring(0, start) + tag + editor.value.substring(start, end) + tag + editor.value.substring(end);
+            handleEditorInput();
             editor.focus();
         }
 
         function updatePreview() {
-            const raw = editor.value;
-            const html = raw
-                .replace(/\*(.*?)\*/g, '<b>$1</b>')
-                .replace(/_(.*?)_/g, '<i>$1</i>');
-            document.getElementById('previewContainer').innerHTML = html;
+            document.getElementById('previewContainer').innerHTML = editor.value
+                .replace(/\*(.*?)\*/g, '<b>$1</b>').replace(/_(.*?)_/g, '<i>$1</i>');
         }
 
         function copyMessage() {
-            navigator.clipboard.writeText(editor.value);
-            showToast("Copied to clipboard!");
+            navigator.clipboard.writeText(editor.value); showToast("Copied to clipboard!");
         }
 
         function sendToWhatsApp() {
-            const encoded = encodeURIComponent(editor.value);
-            window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(editor.value)}`, '_blank');
         }
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.style.opacity = "1";
-            setTimeout(() => { toast.style.opacity = "0"; }, 2000);
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.opacity = "1";
+            setTimeout(() => t.style.opacity = "0", 2000);
         }
 
         window.onload = () => {
-            if (window.innerWidth < 1024) {
-                document.getElementById('settingsContent').classList.add('hidden');
-                document.getElementById('toggleIcon').style.transform = 'rotate(0deg)';
-            } else {
-                document.getElementById('toggleIcon').style.transform = 'rotate(180deg)';
-            }
-            refreshMasterEditor();
+            if (window.innerWidth < 1024) toggleSettings();
+            rebuildEditorFromSettings();
         };
     </script>
 </body>
